@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Directory containing wallpapers
-WALLPAPER_DIR="$HOME/Pictures/Wallpapers"
+WALLPAPER_DIR="$HOME/dotfiles/Pictures/Wallpapers"
 
 # Temporary directory for thumbnails
 THUMB_DIR="/tmp/wallpaper_thumbs"
