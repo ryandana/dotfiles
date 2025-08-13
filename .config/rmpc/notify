@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+# Send the notification
+notify-send -i playing -u normal -t 4000 "Now playing 🎵" "$ARTIST - $TITLE"
