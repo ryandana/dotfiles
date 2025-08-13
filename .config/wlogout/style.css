@@ -25,7 +25,7 @@ button:focus {
 button:hover {
   background-size: 50%;
   box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.4);
-  background-color: #89b4fa; /* blue */
+  background-color: #b4befe; /* blue */
   color: transparent;
   transition: all 0.3s cubic-bezier(0.55, 0, 0.28, 1.682),
     box-shadow 0.5s ease-in;
