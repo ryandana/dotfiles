@@ -128,3 +128,25 @@ min_icon_size = 64
 max_icon_size = 80
 format = "<b>%s</b>\n%b"
 timeout = 5
+
+# Volume notification styling
+[volume]
+    appname = "volume"
+    format = "%s\n%b"
+    timeout = 2
+    urgency = low
+    frame_color = "#89b4fa"
+    background = "#1e1e2e"
+    foreground = "#cdd6f4"
+    highlight = "#89b4fa"
+
+# Brightness notification styling  
+[brightness]
+    appname = "brightness"
+    format = "%s\n%b"
+    timeout = 2
+    urgency = low
+    frame_color = "#f9e2af"
+    background = "#1e1e2e"
+    foreground = "#cdd6f4"
+    highlight = "#f9e2af"
