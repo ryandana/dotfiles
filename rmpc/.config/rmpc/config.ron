@@ -4,7 +4,6 @@
 (
     address: "127.0.0.1:6600",
     cache_dir: Some("/tmp/rmpc/cache"),
-    lyrics_dir: Some("~/Music/mpd"),
     password: None,
     theme: "catppuccin_mocha",
 
@@ -41,7 +40,6 @@
             "3":       SwitchToTab("Albums"),
             "4":       SwitchToTab("Search"),
             "5":       SwitchToTab("Directories"),
-            "6":       SwitchToTab("Lyrics"),
             "q":       Quit,
             ">":       NextTrack,
             "p":       TogglePause,
@@ -140,13 +138,8 @@
         (
             name: "Directories",
             pane: Pane(Directories),
-        ),
-        (
-            name: "Lyrics",
-            pane: Split(
-                direction: Vertical,
-                panes: [(size: "25%", pane: Pane(AlbumArt)), (size: "70%", pane: Pane(Lyrics), vertical_align: Bottom)],
-            ),
+        )
+    ]
         ),
     ],
 )

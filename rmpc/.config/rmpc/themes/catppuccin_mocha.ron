@@ -52,12 +52,6 @@
             width: "20%",
         ),
         (
-            prop: (kind: Sticker("playCount"), default: (kind: Text("0"))),
-            width: "9",
-            alignment: Right,
-            label: "Playcount"
-        ),
-        (
             prop: (kind: Property(Duration),
                 default: (kind: Text("-"))
             ),

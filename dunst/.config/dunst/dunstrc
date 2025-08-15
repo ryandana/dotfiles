@@ -135,10 +135,12 @@ timeout = 5
     format = "%s\n%b"
     timeout = 2
     urgency = low
-    frame_color = "#89b4fa"
+    frame_color = "#cba6f7"
     background = "#1e1e2e"
     foreground = "#cdd6f4"
-    highlight = "#89b4fa"
+    highlight = "#cba6f7"
+
+
 
 # Brightness notification styling  
 [brightness]
