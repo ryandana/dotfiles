@@ -4,6 +4,8 @@
 WALLPAPER_DIR="$HOME/dotfiles/yuusha/Pictures/Wallpapers"
 THUMB_DIR="$HOME/.cache/wallpaper_thumbs"
 LOCKFILE="/tmp/rofi_wallpaper.lock"
+HYPRLOCK_TEMPLATE="$HOME/.config/hypr/hyprlock.conf.template"
+HYPRLOCK_CONF="$HOME/.config/hypr/hyprlock.conf"
 
 # Prevent multiple instances
 if [ -e "$LOCKFILE" ]; then
@@ -21,11 +23,10 @@ find "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.j
     thumb_path="$THUMB_DIR/${filename%.*}.png"
 
     if [ ! -f "$thumb_path" ]; then
-        # Generate in the background
         convert "$wallpaper" -thumbnail 96x96^ -gravity center -extent 96x96 "$thumb_path" 2>/dev/null &
     fi
 done
-wait # ensure all thumbnails are ready
+wait
 
 # Build Rofi entries
 ROFI_ENTRIES=""
@@ -35,18 +36,28 @@ while IFS= read -r wallpaper; do
     [ -f "$thumb_path" ] && ROFI_ENTRIES+="${filename}\0icon\x1f${thumb_path}\n"
 done < <(find "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" \) | sort)
 
-# Show Rofi menu (safe launch)
+# Show Rofi menu
 SELECTED=$(echo -en "$ROFI_ENTRIES" | rofi -dmenu -i -no-lazy-grab -p "Select wallpaper:" -show-icons)
 
-# Apply selected wallpaper with random animation
+# Apply selected wallpaper with transition
 if [ -n "$SELECTED" ]; then
     FULL_PATH=$(find "$WALLPAPER_DIR" -name "$SELECTED" | head -n1)
     if [ -f "$FULL_PATH" ]; then
         TRANSITIONS=("wipe" "grow")
         TRANSITION=${TRANSITIONS[$RANDOM % ${#TRANSITIONS[@]}]}
+
+        # Set wallpaper with swww
         swww img "$FULL_PATH" \
             --transition-type "$TRANSITION" \
             --transition-duration 2 \
             --transition-fps 240
+
+        # --- Hyprlock integration for block-style config ---
+        if [ -f "$HYPRLOCK_TEMPLATE" ]; then
+            # Replace the line that starts with "path =" inside the background block
+            sed "/background {/,/}/s|path = .*|path = $FULL_PATH|" "$HYPRLOCK_TEMPLATE" > "$HYPRLOCK_CONF"
+        else
+            echo "Hyprlock template not found: $HYPRLOCK_TEMPLATE"
+        fi
     fi
 fi

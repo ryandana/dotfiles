@@ -1,5 +1,5 @@
 background {
-    path = /home/yuusha/dotfiles/yuusha/Pictures/Wallpapers/night-city.png
+    path = PLACEHOLDER
     blur_passes = 1
     blur_size = 8
 }

@@ -436,7 +436,7 @@ install_media_tools() {
 
     log "Installing media and utility tools..."
     local media_packages=(
-        yt-dlp zenity cava obs-studio kitty imagemagick
+        yt-dlp zenity cava obs-studio kitty imagemagick kdenlive blender
     )
     
     if ! sudo pacman -S --needed --noconfirm "${media_packages[@]}"; then
@@ -472,7 +472,7 @@ install_hyprland() {
     log "Installing Qt and KDE packages..."
     local qt_kde_packages=(
         qt5-wayland qt6-wayland qt5ct kvantum qt6ct-kde
-        dolphin kdeconnect sshfs ark
+        kdeconnect sshfs
     )
     
     if ! $AUR_HELPER -S --needed --noconfirm "${qt_kde_packages[@]}"; then
@@ -486,7 +486,7 @@ install_hyprland() {
         catppuccin-gtk-theme-mocha papirus-icon-theme otf-font-awesome
         # Hyprland utilities
         wlogout hypridle hyprpicker swww waybar rofi dunst 
-        brightnessctl wl-clipboard rofi-emoji wtype neovim fd fzf grim slurp mpv loupe
+        brightnessctl wl-clipboard rofi-emoji wtype neovim fd fzf grim slurp mpv loupe nautilus file-roller
         # Media
         mpd rmpc pavucontrol
         # Connectivity
@@ -505,20 +505,6 @@ install_hyprland() {
     # Enable and configure services
     systemctl --user enable --now mpd 2>/dev/null || true
     papirus-folder -c cat-mocha-lavender --theme Papirus-Dark 2>/dev/null || true
-
-    # Install SDDM theme
-    log "Installing SDDM theme..."
-    if [ -d "/tmp/SilentSDDM" ]; then
-        rm -rf /tmp/SilentSDDM
-    fi
-    
-    if git clone -b main --depth=1 https://github.com/uiriansan/SilentSDDM /tmp/SilentSDDM; then
-        cd /tmp/SilentSDDM && ./install.sh
-        cd ~
-        rm -rf /tmp/SilentSDDM
-    else
-        warning "Failed to install SDDM theme"
-    fi
 
     # Configure GNOME keybindings if running GNOME
     if [[ "$XDG_CURRENT_DESKTOP" == *"GNOME"* ]]; then

@@ -12,4 +12,4 @@ PCT=$((BRI * 100 / MAX))
 
 # Show OSD without icon
 dunstify -a "brightness" -u low -r $NOTIF_ID \
-    -h int:value:"$PCT" "Brightness: ${PCT}%"
+    -h int:value:"$PCT" "🔅 Brightness: ${PCT}%"
