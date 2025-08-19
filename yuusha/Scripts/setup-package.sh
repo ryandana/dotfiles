@@ -472,7 +472,7 @@ install_hyprland() {
     log "Installing Qt and KDE packages..."
     local qt_kde_packages=(
         qt5-wayland qt6-wayland qt5ct kvantum qt6ct-kde
-        kdeconnect sshfs
+        kdeconnect sshfs kvantum-qt5
     )
     
     if ! $AUR_HELPER -S --needed --noconfirm "${qt_kde_packages[@]}"; then

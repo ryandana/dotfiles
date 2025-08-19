@@ -43,7 +43,7 @@ SELECTED=$(echo -en "$ROFI_ENTRIES" | rofi -dmenu -i -no-lazy-grab -p "Select wa
 if [ -n "$SELECTED" ]; then
     FULL_PATH=$(find "$WALLPAPER_DIR" -name "$SELECTED" | head -n1)
     if [ -f "$FULL_PATH" ]; then
-        TRANSITIONS=("wipe" "grow")
+        TRANSITIONS=("grow")
         TRANSITION=${TRANSITIONS[$RANDOM % ${#TRANSITIONS[@]}]}
 
         # Set wallpaper with swww
