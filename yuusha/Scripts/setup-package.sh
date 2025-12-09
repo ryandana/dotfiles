@@ -263,6 +263,9 @@ install_aur_helper() {
     local temp_dir="/tmp/${aur_helper}-build-$$"
     local repo_url
     
+    # Clean up any existing temp directory
+    rm -rf "$temp_dir" 2>/dev/null || true
+    
     # Set repository URL based on choice
     case "$aur_helper" in
         "paru")
@@ -281,6 +284,7 @@ install_aur_helper() {
     
     if ! git clone "$repo_url" "$temp_dir"; then
         error "Failed to clone $aur_helper repository"
+        rm -rf "$temp_dir" 2>/dev/null || true
         return 1
     fi
     
@@ -327,6 +331,99 @@ install_flatpak() {
     return 0
 }
 
+# Function to choose editor
+choose_editor() {
+    echo ""
+    echo -e "${CYAN}Available Editors:${NC}"
+    echo -e "  ${BLUE}1.${NC} neovim (nvim)"
+    echo -e "  ${BLUE}2.${NC} visual-studio-code-bin (VS Code)"
+    echo -e "  ${BLUE}3.${NC} code-oss (Open Source VS Code)"
+    echo -e "  ${BLUE}4.${NC} antigravity (AI Code Editor)"
+    echo -e "  ${BLUE}5.${NC} Skip editor installation"
+    echo ""
+    
+    while true; do
+        echo -ne "${YELLOW}Choose editor [1-5]:${NC} "
+        read -r choice
+        
+        case "$choice" in
+            1)
+                echo "neovim"
+                return 0
+                ;;
+            2)
+                echo "visual-studio-code-bin"
+                return 0
+                ;;
+            3)
+                echo "code"
+                return 0
+                ;;
+            4)
+                echo "antigravity"
+                return 0
+                ;;
+            5)
+                echo "skip"
+                return 0
+                ;;
+            *)
+                echo -e "${RED}Please choose 1, 2, 3, 4, or 5${NC}"
+                continue
+                ;;
+        esac
+    done
+}
+
+# Function to choose browser
+choose_browser() {
+    echo ""
+    echo -e "${CYAN}Available Browsers:${NC}"
+    echo -e "  ${BLUE}1.${NC} firefox"
+    echo -e "  ${BLUE}2.${NC} google-chrome"
+    echo -e "  ${BLUE}3.${NC} chromium"
+    echo -e "  ${BLUE}4.${NC} zen-browser-bin"
+    echo -e "  ${BLUE}5.${NC} librewolf-bin"
+    echo -e "  ${BLUE}6.${NC} Skip browser installation"
+    echo ""
+    
+    while true; do
+        echo -ne "${YELLOW}Choose browser [1-6]:${NC} "
+        read -r choice
+        
+        case "$choice" in
+            1)
+                echo "firefox"
+                return 0
+                ;;
+            2)
+                echo "google-chrome"
+                return 0
+                ;;
+            3)
+                echo "chromium"
+                return 0
+                ;;
+            4)
+                echo "zen-browser-bin"
+                return 0
+                ;;
+            5)
+                echo "librewolf-bin"
+                return 0
+                ;;
+            6)
+                echo "skip"
+                return 0
+                ;;
+            *)
+                echo -e "${RED}Please choose 1, 2, 3, 4, 5, or 6${NC}"
+                continue
+                ;;
+        esac
+    done
+}
+
 # Module 6: Development Tools
 install_development_tools() {
     print_header "DEVELOPMENT TOOLS"
@@ -346,8 +443,7 @@ install_development_tools() {
     # Install development dependencies first
     log "Installing development dependencies..."
     local dev_deps=(
-        make openssl zlib bzip2 readline sqlite llvm
-        ncurses xz tk libxml2 libxslt libffi
+        make openssl zlib bzip2 llvm
     )
     
     if ! sudo pacman -S --needed --noconfirm "${dev_deps[@]}"; then
@@ -355,16 +451,46 @@ install_development_tools() {
         return 1
     fi
 
-    # Visual Studio Code
-    log "Installing Visual Studio Code..."
-    if ! $AUR_HELPER -S --needed --noconfirm visual-studio-code-bin; then
-        warning "Failed to install VS Code"
+    # Editor selection
+    local editor
+    editor=$(choose_editor)
+    
+    if [ "$editor" != "skip" ]; then
+        log "Installing $editor..."
+        if [ "$editor" = "neovim" ]; then
+            # neovim is in official repos
+            if ! sudo pacman -S --needed --noconfirm neovim; then
+                warning "Failed to install neovim"
+            fi
+        else
+            # AUR packages
+            if ! $AUR_HELPER -S --needed --noconfirm "$editor"; then
+                warning "Failed to install $editor"
+            fi
+        fi
+    else
+        info "Skipping editor installation"
     fi
 
-    # Google Chrome
-    log "Installing Google Chrome..."
-    if ! $AUR_HELPER -S --needed --noconfirm google-chrome; then
-        warning "Failed to install Google Chrome"
+    # Browser selection
+    local browser
+    browser=$(choose_browser)
+    
+    if [ "$browser" != "skip" ]; then
+        log "Installing $browser..."
+        if [ "$browser" = "firefox" ] || [ "$browser" = "chromium" ]; then
+            # These are in official repos
+            if ! sudo pacman -S --needed --noconfirm "$browser"; then
+                warning "Failed to install $browser"
+            fi
+        else
+            # AUR packages
+            if ! $AUR_HELPER -S --needed --noconfirm "$browser"; then
+                warning "Failed to install $browser"
+            fi
+        fi
+    else
+        info "Skipping browser installation"
     fi
 
     # Docker
@@ -411,24 +537,6 @@ install_nodejs() {
     return 0
 }
 
-# Module 8: Python (Pyenv)
-install_python() {
-    print_header "PYTHON INSTALLATION (OFFICIAL PYENV)"
-
-    if [ -d "$HOME/.pyenv" ]; then
-        log "Pyenv already installed, skipping..."
-        return 0
-    fi
-
-    log "Installing Pyenv from official repository..."
-    if ! curl -s https://pyenv.run | bash; then
-        error "Failed to install Pyenv"
-        return 1
-    fi
-
-    success "Pyenv installed successfully"
-    return 0
-}
 
 # Module 9: Media and Utility Tools
 install_media_tools() {
@@ -482,7 +590,7 @@ install_hyprland() {
     log "Installing Hyprland packages from AUR..."
     local hyprland_packages=(
         # System info & tweaks
-        neofetch nwg-look papirus-folders-catppuccin-git 
+        fastfetch nwg-look papirus-folders-catppuccin-git hyprlock
         catppuccin-gtk-theme-mocha papirus-icon-theme otf-font-awesome
         # Hyprland utilities
         wlogout hypridle hyprpicker swww waybar rofi dunst 
@@ -596,63 +704,6 @@ install_shell() {
     return 0
 }
 
-# Module 13: Custom Scripts
-install_scripts() {
-    print_header "CUSTOM SCRIPTS INSTALLATION"
-
-    log "Creating Scripts directory..."
-    mkdir -p ~/Scripts
-
-    log "Installing yt-dlp.sh script..."
-    cat > ~/Scripts/yt-dlp.sh << 'EOF'
-#!/bin/bash
-# === Downloader Script by yuusha ===
-
-url=$(zenity --entry --title="Downloader" --text="Enter the video URL:" --width="600")
-[ -z "$url" ] && exit 1
-
-choice=$(zenity --list --radiolist \
-    --title="Download Type" \
-    --text="Choose what to download:" \
-    --column="Pick" --column="Type" \
-    TRUE "Video (MP4 with AAC)" \
-    FALSE "Audio (MP3)")
-[ -z "$choice" ] && exit 1
-
-if [ "$choice" = "Video (MP4 with AAC)" ]; then
-    outpath="$HOME/Videos/%(title).200s.%(ext)s"
-    format="bv*[ext=mp4]+ba[acodec^=mp4a]/b[ext=mp4]/b"
-    opts=(--merge-output-format mp4)
-else
-    outpath="$HOME/Music/%(title).200s.%(ext)s"
-    format="bestaudio"
-    opts=(--extract-audio --audio-format mp3)
-fi
-
-(
-    yt-dlp "$url" -f "$format" "${opts[@]}" --embed-thumbnail --embed-metadata \
-        --add-metadata --audio-quality 0 --no-mtime --newline \
-        --progress-template "download:%(progress._percent_str)s" -o "$outpath" 2>&1 |
-    while read -r line; do
-        if [[ "$line" =~ ([0-9]{1,3}\.[0-9])% ]]; then
-            percent=${BASH_REMATCH[1]}
-            echo "${percent%.*}"
-        fi
-    done
-) | zenity --progress --title="Downloader" --text="Downloading..." \
-    --percentage=0 --auto-close --width=400 --window-icon=info
-
-if [ $? -eq 0 ]; then
-    notify-send "Downloader" "Download completed."
-else
-    notify-send "Downloader" "Download cancelled or failed."
-fi
-EOF
-
-    chmod +x ~/Scripts/yt-dlp.sh
-    success "Custom scripts installed"
-    return 0
-}
 
 # ============================================================================
 # MAIN INSTALLATION FLOW
@@ -745,20 +796,17 @@ main() {
         ["Flatpak Support"]="install_flatpak"
         ["Development Tools"]="install_development_tools"
         ["Node.js (NVM)"]="install_nodejs"
-        ["Python (Pyenv)"]="install_python"
         ["Media & Utility Tools"]="install_media_tools"
         ["Hyprland Desktop"]="install_hyprland"
         ["Fonts"]="install_fonts"
         ["Shell (Zsh + Starship)"]="install_shell"
-        ["Custom Scripts"]="install_scripts"
     )
     
     # Install modules based on user choice
     for module_name in "System Essentials" "Intel Hardware Support" "Network Tools" \
                       "AUR Helper (Paru)" "Flatpak Support" "Development Tools" \
-                      "Node.js (NVM)" "Python (Pyenv)" "Media & Utility Tools" \
-                      "Hyprland Desktop" "Fonts" "Shell (Zsh + Starship)" \
-                      "Custom Scripts"; do
+                      "Node.js (NVM)" "Media & Utility Tools" \
+                      "Hyprland Desktop" "Fonts" "Shell (Zsh + Starship)"; do
         
         if prompt_yes_no "Install $module_name?"; then
             local function_name="${modules[$module_name]}"
@@ -816,8 +864,7 @@ EOF
     echo -e "  ${BLUE}2.${NC} Configure your shell manually if desired"
     echo -e "  ${BLUE}3.${NC} Docker group membership will be active after reboot"
     echo -e "  ${BLUE}4.${NC} Use ${WHITE}nvm list${NC} to see installed Node.js versions"
-    echo -e "  ${BLUE}5.${NC} Install Python: ${WHITE}pyenv install 3.12.7 && pyenv global 3.12.7${NC}"
-    echo -e "  ${BLUE}6.${NC} Custom scripts are available in ${WHITE}~/Scripts${NC}"
+    echo -e "  ${BLUE}5.${NC} Install Python via system packages: ${WHITE}sudo pacman -S python${NC}"
     echo -e "  ${BLUE}7.${NC} Configure Starship theme manually if desired"
     echo ""
     
