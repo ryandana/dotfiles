@@ -590,11 +590,11 @@ install_hyprland() {
     log "Installing Hyprland packages from AUR..."
     local hyprland_packages=(
         # System info & tweaks
-        fastfetch nwg-look papirus-folders-catppuccin-git hyprlock
-        catppuccin-gtk-theme-mocha papirus-icon-theme otf-font-awesome
+        fastfetch nwg-look hyprlock papirus-icon-theme otf-font-awesome
+        # catppuccin-gtk-theme-mocha papirus-folders-catppuccin-git
         # Hyprland utilities
         wlogout hypridle hyprpicker swww waybar rofi dunst 
-        brightnessctl wl-clipboard rofi-emoji wtype neovim fd fzf grim slurp mpv loupe nautilus file-roller
+        brightnessctl wl-clipboard rofi-emoji wtype fd fzf grim slurp mpv loupe nautilus file-roller
         # Media
         mpd rmpc pavucontrol
         # Connectivity
