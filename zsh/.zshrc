@@ -46,7 +46,7 @@ alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
 
 # Docker aliases
 alias d='docker'
-alias dc='docker-compose'
+alias dc='docker compose'
 alias dps='docker ps'
 alias di='docker images'
 
