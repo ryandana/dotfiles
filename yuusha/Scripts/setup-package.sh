@@ -596,7 +596,8 @@ install_hyprland() {
         wlogout hypridle hyprpicker swww waybar rofi dunst 
         brightnessctl wl-clipboard rofi-emoji wtype fd fzf grim slurp mpv loupe nautilus file-roller
         # Media
-        mpd rmpc pavucontrol
+        # mpd rmpc
+        pavucontrol
         # Connectivity
         blueman
         # Apps
@@ -611,8 +612,8 @@ install_hyprland() {
     fi
 
     # Enable and configure services
-    systemctl --user enable --now mpd 2>/dev/null || true
-    papirus-folder -c cat-mocha-lavender --theme Papirus-Dark 2>/dev/null || true
+    # systemctl --user enable --now mpd 2>/dev/null || true
+    # papirus-folder -c cat-mocha-lavender --theme Papirus-Dark 2>/dev/null || true
 
     # Configure GNOME keybindings if running GNOME
     if [[ "$XDG_CURRENT_DESKTOP" == *"GNOME"* ]]; then
